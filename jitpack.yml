@@ -1,8 +1,6 @@
 # JitPack build config — https://jitpack.io/docs/BUILDING/
 jdk:
   - openjdk21
-before_install:
-  - sdk info java
 install:
   # Publish library modules only; skip sample/tests for a leaner build.
   - ./gradlew :mmp-core:publishReleasePublicationToMavenLocal
@@ -12,3 +10,4 @@ install:
       -x lint
       --no-configuration-cache
       --stacktrace
+      --no-daemon
