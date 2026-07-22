@@ -1,0 +1,12 @@
+# Copy keys below into local.properties (gitignored).
+# sample/build.gradle.kts injects them into BuildConfig for the demo app.
+
+# sdk.dir is usually written by Android Studio
+# sdk.dir=/Users/you/Library/Android/sdk
+
+# platform: appsflyer | adjust
+mmp.platform=appsflyer
+mmp.appToken=YOUR_DEV_KEY_OR_APP_TOKEN
+mmp.appId=
+mmp.isDebug=true
+mmp.enableLog=true

@@ -1,0 +1,3 @@
+# AppsFlyer keep rules — keep SDK entry points used via reflection.
+-keep class com.appsflyer.** { *; }
+-dontwarn com.appsflyer.**
