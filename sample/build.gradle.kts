@@ -28,7 +28,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.kit.mmp.sample"
+        applicationId = escapeForBuildConfig(local("application", "com.kit.mmp.sample"))
         minSdk = 24
         targetSdk = 37
         versionCode = 1
