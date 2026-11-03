@@ -1,6 +1,6 @@
 # AGENTS.md — guidance for coding agents
 
-This file is for AI agents working in **MmpKit**. Prefer it over guessing. Human integration docs: `README.md`.
+This file is for AI agents working in **MmpKit-Android**. Prefer it over guessing. Human integration docs: `README.md`.
 
 ## What this repo is
 

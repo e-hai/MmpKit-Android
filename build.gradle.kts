@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.android.library) apply false
 }
 
-val mmpGroup = providers.gradleProperty("GROUP").orElse("com.github.e-hai")
+val mmpGroup = providers.gradleProperty("GROUP").orElse("com.github.e-hai.MmpKit-Android")
 val mmpVersion = providers.gradleProperty("VERSION_NAME").orElse("1.0.0")
 
 subprojects {
@@ -39,8 +39,8 @@ subprojects {
 
                         pom {
                             name.set(project.name)
-                            description.set("MmpKit — unified Android MMP attribution SDK wrappers")
-                            url.set("https://github.com/e-hai/MmpKit")
+                            description.set("MmpKit-Android — unified Android MMP attribution SDK wrappers")
+                            url.set("https://github.com/e-hai/MmpKit-Android")
 
                             licenses {
                                 license {
@@ -57,9 +57,9 @@ subprojects {
                             }
 
                             scm {
-                                connection.set("scm:git:git://github.com/e-hai/MmpKit.git")
-                                developerConnection.set("scm:git:ssh://github.com/e-hai/MmpKit.git")
-                                url.set("https://github.com/e-hai/MmpKit")
+                                connection.set("scm:git:git://github.com/e-hai/MmpKit-Android.git")
+                                developerConnection.set("scm:git:ssh://github.com/e-hai/MmpKit-Android.git")
+                                url.set("https://github.com/e-hai/MmpKit-Android")
                             }
                         }
                     }

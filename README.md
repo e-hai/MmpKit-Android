@@ -1,4 +1,4 @@
-# MmpKit
+# MmpKit-Android
 
 Android 归因（MMP）统一封装库。业务只依赖一套 API，通过替换实现模块切换 **AppsFlyer** / **Adjust** 等平台。
 
@@ -38,10 +38,10 @@ dependencyResolutionManagement {
 ```kotlin
 dependencies {
     // 必选
-    implementation("com.github.e-hai.MmpKit:mmp-core:Tag")
+    implementation("com.github.e-hai.MmpKit-Android:mmp-core:Tag")
     // 二选一
-    implementation("com.github.e-hai.MmpKit:mmp-appsflyer:Tag")
-    // implementation("com.github.e-hai.MmpKit:mmp-adjust:Tag")
+    implementation("com.github.e-hai.MmpKit-Android:mmp-appsflyer:Tag")
+    // implementation("com.github.e-hai.MmpKit-Android:mmp-adjust:Tag")
 }
 ```
 
@@ -217,6 +217,6 @@ Demo 界面支持：Track Event / Revenue、同步+异步读归因、开关日�
 ```
 
 3. Push 到 GitHub 并打 tag / Release（例如 `1.0.0`）
-4. 打开 [jitpack.io](https://jitpack.io/#e-hai/MmpKit) → Look up → 选择对应 Tag 构建
+4. 打开 [jitpack.io](https://jitpack.io/#e-hai/MmpKit-Android) → Look up → 选择对应 Tag 构建
 
 配置见 [jitpack.yml](jitpack.yml)；发布逻辑在根目录 [build.gradle.kts](build.gradle.kts)。
