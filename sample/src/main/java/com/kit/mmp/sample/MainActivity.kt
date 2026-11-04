@@ -40,6 +40,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kit.mmp.Mmp
+import com.kit.mmp.adjust.AdjustClient
+import com.kit.mmp.appsflyer.AppsFlyerClient
 import com.kit.mmp.attribution.AttributionData
 import com.kit.mmp.deeplink.DeepLinkResult
 import com.kit.mmp.event.MmpRevenue
@@ -95,6 +97,73 @@ class MainActivity : ComponentActivity() {
                         Mmp.setLogEnabled(next)
                         DemoStore.setLogEnabled(next)
                     },
+                    onSimulateNonOrganic = {
+                        val client = SampleApp.currentClient
+                        if (client is AppsFlyerClient) {
+                            client.simulateConversionData(
+                                mapOf(
+                                    "af_status" to "Non-organic",
+                                    "media_source" to "googleadwords_int",
+                                    "campaign" to "summer_sale_2026",
+                                    "af_adset" to "group_android",
+                                    "af_ad" to "banner_300x250",
+                                ),
+                            )
+                        } else if (client is AdjustClient) {
+                            client.simulateAttributionData(
+                                AttributionData(
+                                    network = "googleadwords_int",
+                                    campaign = "summer_sale_2026",
+                                    adGroup = "group_android",
+                                    creative = "banner_300x250",
+                                    clickLabel = null,
+                                    isOrganic = false,
+                                ),
+                            )
+                        }
+                        Mmp.attribution?.let { DemoStore.onAttribution(it) }
+                        DemoStore.append("Simulated: Non-organic attribution injected")
+                    },
+                    onSimulateOrganic = {
+                        val client = SampleApp.currentClient
+                        if (client is AppsFlyerClient) {
+                            client.simulateConversionData(
+                                mapOf(
+                                    "af_status" to "Organic",
+                                ),
+                            )
+                        } else if (client is AdjustClient) {
+                            client.simulateAttributionData(
+                                AttributionData(
+                                    network = "Organic",
+                                    campaign = null,
+                                    adGroup = null,
+                                    creative = null,
+                                    clickLabel = null,
+                                    isOrganic = true,
+                                ),
+                            )
+                        }
+                        Mmp.attribution?.let { DemoStore.onAttribution(it) }
+                        DemoStore.append("Simulated: Organic attribution injected")
+                    },
+                    onSimulateDeepLink = {
+                        val client = SampleApp.currentClient
+                        if (client is AppsFlyerClient) {
+                            client.simulateDeepLink(
+                                deepLinkValue = "myapp://promo/spring_sale",
+                                clickEvent = mapOf("campaign" to "spring_sale", "discount" to "50%"),
+                                isDeferred = true,
+                            )
+                        } else if (client is AdjustClient) {
+                            client.simulateDeepLink(
+                                deepLinkValue = "myapp://promo/spring_sale",
+                                clickEvent = mapOf("campaign" to "spring_sale", "discount" to "50%"),
+                                isDeferred = true,
+                            )
+                        }
+                        DemoStore.append("Simulated: DeepLink event injected")
+                    },
                 )
             }
         }
@@ -109,6 +178,9 @@ fun DemoScreen(
     onTrackRevenue: () -> Unit = {},
     onGetAttribution: () -> Unit = {},
     onToggleLog: () -> Unit = {},
+    onSimulateNonOrganic: () -> Unit = {},
+    onSimulateOrganic: () -> Unit = {},
+    onSimulateDeepLink: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -146,6 +218,9 @@ fun DemoScreen(
                     onTrackRevenue = onTrackRevenue,
                     onGetAttribution = onGetAttribution,
                     onToggleLog = onToggleLog,
+                    onSimulateNonOrganic = onSimulateNonOrganic,
+                    onSimulateOrganic = onSimulateOrganic,
+                    onSimulateDeepLink = onSimulateDeepLink,
                 )
             }
             item {
@@ -240,6 +315,9 @@ private fun ActionsSection(
     onTrackRevenue: () -> Unit,
     onGetAttribution: () -> Unit,
     onToggleLog: () -> Unit,
+    onSimulateNonOrganic: () -> Unit,
+    onSimulateOrganic: () -> Unit,
+    onSimulateDeepLink: () -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("Actions", style = MaterialTheme.typography.titleMedium)
@@ -271,6 +349,37 @@ private fun ActionsSection(
             ) {
                 Text(if (logEnabled) "Disable Log" else "Enable Log")
             }
+        }
+        Text("Local Testing / Mock Simulation", style = MaterialTheme.typography.titleSmall)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            Button(
+                onClick = onSimulateNonOrganic,
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                ),
+            ) {
+                Text("Mock Non-Organic", style = MaterialTheme.typography.labelSmall)
+            }
+            Button(
+                onClick = onSimulateOrganic,
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                ),
+            ) {
+                Text("Mock Organic", style = MaterialTheme.typography.labelSmall)
+            }
+        }
+        Button(
+            onClick = onSimulateDeepLink,
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            ),
+        ) {
+            Text("Mock DeepLink (myapp://promo/spring_sale)")
         }
     }
 }

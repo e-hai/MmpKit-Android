@@ -98,6 +98,33 @@ class AppsFlyerClient : MmpClient {
 
     override fun peekAttribution(): AttributionData? = cachedAttribution
 
+    /**
+     * 本地测试 / 模拟方法：手动注入归因数据，无需连接 AppsFlyer 真实后台或白名单真机。
+     */
+    fun simulateConversionData(data: Map<String, Any>) {
+        val mapped = data.toAttributionData()
+        cachedAttribution = mapped
+        MmpLog.i("AppsFlyer [Simulated] attribution: $mapped", TAG)
+        attributionListener?.onAttribution(mapped)
+    }
+
+    /**
+     * 本地测试 / 模拟方法：手动触发深度链接回调。
+     */
+    fun simulateDeepLink(
+        deepLinkValue: String?,
+        clickEvent: Map<String, Any?> = emptyMap(),
+        isDeferred: Boolean = false,
+    ) {
+        val mapped = MmpDeepLinkResult(
+            deepLinkValue = deepLinkValue,
+            clickEvent = clickEvent,
+            isDeferred = isDeferred,
+        )
+        MmpLog.i("AppsFlyer [Simulated] deep link: $mapped", TAG)
+        deepLinkListener?.onDeepLink(mapped)
+    }
+
     private val conversionListener = object : AppsFlyerConversionListener {
         override fun onConversionDataSuccess(conversionData: MutableMap<String, Any>?) {
             MmpLog.d("AppsFlyer onConversionDataSuccess raw=$conversionData", TAG)

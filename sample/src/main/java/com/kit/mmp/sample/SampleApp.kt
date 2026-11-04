@@ -17,6 +17,7 @@ class SampleApp : Application() {
             "adjust" -> AdjustClient()
             else -> AppsFlyerClient()
         }
+        currentClient = client
         val platformLabel = when (client) {
             is AdjustClient -> "Adjust"
             else -> "AppsFlyer"
@@ -50,5 +51,9 @@ class SampleApp : Application() {
     private fun mask(token: String): String {
         if (token.length <= 8) return "****"
         return "${token.take(4)}****${token.takeLast(4)}"
+    }
+
+    companion object {
+        var currentClient: MmpClient? = null
     }
 }

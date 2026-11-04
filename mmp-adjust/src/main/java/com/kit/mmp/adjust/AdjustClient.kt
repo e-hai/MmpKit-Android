@@ -127,6 +127,32 @@ class AdjustClient : MmpClient {
 
     override fun peekAttribution(): AttributionData? = cachedAttribution
 
+    /**
+     * 本地测试 / 模拟方法：手动注入归因数据，无需连接 Adjust 真实后台。
+     */
+    fun simulateAttributionData(data: AttributionData) {
+        cachedAttribution = data
+        MmpLog.i("Adjust [Simulated] attribution: $data", TAG)
+        attributionListener?.onAttribution(data)
+    }
+
+    /**
+     * 本地测试 / 模拟方法：手动触发深度链接回调。
+     */
+    fun simulateDeepLink(
+        deepLinkValue: String?,
+        clickEvent: Map<String, Any?> = emptyMap(),
+        isDeferred: Boolean = false,
+    ) {
+        val mapped = DeepLinkResult(
+            deepLinkValue = deepLinkValue,
+            clickEvent = clickEvent,
+            isDeferred = isDeferred,
+        )
+        MmpLog.i("Adjust [Simulated] deep link: $mapped", TAG)
+        deepLinkListener?.onDeepLink(mapped)
+    }
+
     private companion object {
         const val TAG = "MmpKit/Adjust"
 
