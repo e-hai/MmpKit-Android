@@ -8,7 +8,9 @@ plugins {
     alias(libs.plugins.android.library) apply false
 }
 
-val mmpGroup = providers.gradleProperty("GROUP").orElse("com.github.e-hai.MmpKit-Android")
+val mmpGroup = providers.gradleProperty("GROUP_ID")
+    .orElse(providers.gradleProperty("GROUP"))
+    .orElse("com.github.e-hai")
 val mmpVersion = providers.gradleProperty("VERSION_NAME").orElse("1.0.0")
 
 subprojects {
@@ -61,6 +63,21 @@ subprojects {
                                 developerConnection.set("scm:git:ssh://github.com/e-hai/MmpKit-Android.git")
                                 url.set("https://github.com/e-hai/MmpKit-Android")
                             }
+                        }
+                    }
+                }
+
+                repositories {
+                    maven {
+                        name = "GitHubPackages"
+                        url = uri("https://maven.pkg.github.com/e-hai/MmpKit-Android")
+                        credentials {
+                            username = providers.gradleProperty("gpr.user").orNull
+                                ?: providers.environmentVariable("GITHUB_ACTOR").orNull
+                                ?: (project.findProperty("gpr.user") as? String)
+                            password = providers.gradleProperty("gpr.key").orNull
+                                ?: providers.environmentVariable("GITHUB_TOKEN").orNull
+                                ?: (project.findProperty("gpr.key") as? String)
                         }
                     }
                 }

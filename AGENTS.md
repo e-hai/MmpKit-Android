@@ -17,8 +17,8 @@ Android library that wraps MMP attribution SDKs (AppsFlyer, Adjust, …) behind 
 
 - Versions: `gradle/libs.versions.toml`
 - Modules: `settings.gradle.kts`
-- Publishing: configured centrally in root `build.gradle.kts` for all `mmp-*` modules
-- Coordinates: `com.github.e-hai.MmpKit-Android:<module>:<tag>`
+- Publishing: configured centrally in root `build.gradle.kts` for all `mmp-*` modules via `publishReleasePublicationToGitHubPackagesRepository`
+- Coordinates: `com.github.e-hai:<module>:<tag>` (hosted on GitHub Packages Maven)
 
 ## Package Layout (`mmp-core`)
 

@@ -1,7 +1,8 @@
 # MmpKit-Android
 
 [![Platform](https://img.shields.io/badge/Platform-Android%207.0%2B%20(API%2024%2B)-blue.svg)](#环境要求)
-[![Release](https://img.shields.io/badge/Release-1.0.0-green.svg)](#1-添加依赖-jitpack)
+[![Release](https://img.shields.io/badge/Release-1.0.0-green.svg)](#1-依赖配置-github-packages)
+[![GitHub Packages](https://img.shields.io/badge/Maven-GitHub%20Packages-blue.svg)](https://github.com/e-hai/MmpKit-Android/packages)
 [![Vendor](https://img.shields.io/badge/Vendor-AppsFlyer%20%7C%20Adjust-orange.svg)](#模块说明)
 [![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)](LICENSE)
 
@@ -101,30 +102,74 @@ sequenceDiagram
 
 ## 快速接入
 
-### 1. 添加依赖 (JitPack)
+### 1. 依赖配置 (GitHub Packages)
 
-在项目根目录 `settings.gradle.kts` 中添加 JitPack 仓库源：
+MmpKit 发布于 **GitHub Packages** Maven 仓库。由于 GitHub Packages 机制限制（即使是公开仓库的 Package，下载也需经过 GitHub 凭据认证），请按照以下三步完成接入：
 
+#### 步骤 A：本地机器配置 GitHub 凭据（全局仅需一次）
+为防止 Token 误提交进业务代码仓库，强烈建议将凭证写入个人电脑的用户主目录：`~/.gradle/gradle.properties`：
+
+```properties
+# 在 ~/.gradle/gradle.properties 中添加（若无此文件可直接新建）：
+gpr.user=YOUR_GITHUB_USERNAME
+gpr.key=ghp_YOUR_PERSONAL_ACCESS_TOKEN
+```
+
+> **说明**：`gpr.key` 是你的 GitHub Personal Access Token (Classic 或 Fine-grained)，至少需要具备 `read:packages` 权限（生成路径：GitHub -> Settings -> Developer settings -> Personal access tokens）。
+
+#### 步骤 B：在项目仓库配置中添加 GitHub Packages 源
+在你的业务项目根目录 `settings.gradle.kts`（推荐）或根 `build.gradle.kts` 中添加仓库源：
+
+**Kotlin DSL (`settings.gradle.kts`)**：
 ```kotlin
 dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven(url = "https://jitpack.io")
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/e-hai/MmpKit-Android")
+            credentials {
+                username = providers.gradleProperty("gpr.user").orNull ?: System.getenv("GITHUB_ACTOR")
+                password = providers.gradleProperty("gpr.key").orNull ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 }
 ```
 
-在业务模块的 `build.gradle.kts` 中按需添加依赖（替换 `1.0.0` 为实际版本号）：
+<details>
+<summary>点击展开 Groovy DSL (`settings.gradle`) 配置写法</summary>
+
+```groovy
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/e-hai/MmpKit-Android")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
+```
+</details>
+
+#### 步骤 C：添加库依赖
+在业务模块的 `build.gradle.kts` 中按需添加依赖（将 `1.0.0` 替换为最新发布版本）：
 
 ```kotlin
 dependencies {
-    // 1. 核心库（必选）
-    implementation("com.github.e-hai.MmpKit-Android:mmp-core:1.0.0")
+    // 1. 核心库（定义统一门面 Mmp、MmpClient 协议与归一化模型）
+    implementation("com.github.e-hai:mmp-core:1.0.0")
 
-    // 2. 厂商适配器（按业务选型二选一）
-    implementation("com.github.e-hai.MmpKit-Android:mmp-appsflyer:1.0.0")
-    // implementation("com.github.e-hai.MmpKit-Android:mmp-adjust:1.0.0")
+    // 2. 厂商适配器（按业务选型引入；适配器内部已 api 依赖 mmp-core）
+    implementation("com.github.e-hai:mmp-appsflyer:1.0.0") // AppsFlyer 适配器
+    // implementation("com.github.e-hai:mmp-adjust:1.0.0")   // Adjust 适配器
 }
 ```
 
@@ -345,22 +390,26 @@ cd MmpKit-Android
 
 ---
 
-## 发布至 JitPack (维护者参考)
+## 发布至 GitHub Packages (维护者参考)
 
-1. 确认 `gradle.properties` 中的 `GROUP` 与 `VERSION_NAME`：
-   ```properties
-   GROUP=com.github.e-hai.MmpKit-Android
-   VERSION_NAME=1.0.0
-   ```
-2. 本地发布校验：
-   ```bash
-   ./gradlew :mmp-core:publishReleasePublicationToMavenLocal \
-     :mmp-appsflyer:publishReleasePublicationToMavenLocal \
-     :mmp-adjust:publishReleasePublicationToMavenLocal \
-     --no-configuration-cache
-   ```
-3. Push 至 GitHub 并打 Release Tag（如 `1.0.0`）。
-4. 在 [JitPack MmpKit-Android](https://jitpack.io/#e-hai/MmpKit-Android) 触发构建即可。
+本项目配置了自动化 GitHub Actions CI 流程（见 `.github/workflows/publish.yml`）：
+
+1. **自动发布**：向远端推送版本 Tag（例如 `1.0.0` 或 `v1.0.0`）或在 GitHub 上创建 Release，将自动触发打包并发布 `:mmp-core`、`:mmp-appsflyer`、`:mmp-adjust` 至 GitHub Packages。
+2. **手动发布**：可在 GitHub 仓库 Actions 页面选择 `Publish MmpKit to GitHub Packages` 工作流，输入目标版本号后手动触发。
+3. **本地发布与验证**：
+   - 验证本地 Maven 安装：
+     ```bash
+     ./gradlew publishReleasePublicationToMavenLocal --no-configuration-cache
+     ```
+   - 本地直接向 GitHub Packages 发布（需配置环境变量 `GITHUB_ACTOR` 与 `GITHUB_TOKEN`）：
+     ```bash
+     ./gradlew \
+       :mmp-core:publishReleasePublicationToGitHubPackagesRepository \
+       :mmp-appsflyer:publishReleasePublicationToGitHubPackagesRepository \
+       :mmp-adjust:publishReleasePublicationToGitHubPackagesRepository \
+       -PVERSION_NAME=1.0.0 \
+       --no-configuration-cache
+     ```
 
 ---
 
