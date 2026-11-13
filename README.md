@@ -1,7 +1,7 @@
 # MmpKit-Android
 
 [![Platform](https://img.shields.io/badge/Platform-Android%207.0%2B%20(API%2024%2B)-blue.svg)](#环境要求)
-[![Release](https://img.shields.io/badge/Release-1.0.0-green.svg)](#1-依赖配置-github-packages)
+[![Release](https://img.shields.io/badge/Release-1.0.1-green.svg)](#1-依赖配置-github-packages)
 [![GitHub Packages](https://img.shields.io/badge/Maven-GitHub%20Packages-blue.svg)](https://github.com/e-hai/MmpKit-Android/packages)
 [![Vendor](https://img.shields.io/badge/Vendor-AppsFlyer%20%7C%20Adjust-orange.svg)](#模块说明)
 [![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)](LICENSE)
@@ -160,16 +160,16 @@ dependencyResolutionManagement {
 </details>
 
 #### 步骤 C：添加库依赖
-在业务模块的 `build.gradle.kts` 中按需添加依赖（将 `1.0.0` 替换为最新发布版本）：
+在业务模块的 `build.gradle.kts` 中按需添加依赖（将 `1.0.1` 替换为最新发布版本）：
 
 ```kotlin
 dependencies {
     // 1. 核心库（定义统一门面 Mmp、MmpClient 协议与归一化模型）
-    implementation("com.github.e-hai:mmp-core:1.0.0")
+    implementation("com.github.e-hai:mmp-core:1.0.1")
 
     // 2. 厂商适配器（按业务选型引入；适配器内部已 api 依赖 mmp-core）
-    implementation("com.github.e-hai:mmp-appsflyer:1.0.0") // AppsFlyer 适配器
-    // implementation("com.github.e-hai:mmp-adjust:1.0.0")   // Adjust 适配器
+    implementation("com.github.e-hai:mmp-appsflyer:1.0.1") // AppsFlyer 适配器
+    // implementation("com.github.e-hai:mmp-adjust:1.0.1")   // Adjust 适配器
 }
 ```
 
@@ -292,17 +292,37 @@ Mmp.getAttribution { data ->
 
 ### 4. 深度链接 (Deep Linking)
 
-支持统一标准 Deep Link 与延迟深度链接（Deferred Deep Link）：
+支持统一标准 Direct Deep Link 与延迟深度链接（Deferred Deep Link）：
 
 ```kotlin
+// 1. 注册统一深度链接监听器（建议在 Application.onCreate 初始化时注册）
 Mmp.setDeepLinkListener { result ->
-    val url = result.deepLinkValue // 链接地址，如 myapp://promo/spring_sale
+    val url = result.deepLinkValue // 链接地址，如 mmpkit://promo/spring_sale
     val params = result.clickEvent  // 携带的点击参数 Map
     val isDeferred = result.isDeferred // 是否为安装后延迟启动唤起
     
     // 执行应用内路由跳转
 }
+
+// 2. 在入口 Activity 的 onCreate 与 onNewIntent 转发直接深度链接 Intent
+override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    Mmp.handleDeepLink(this, intent)
+}
+
+override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    setIntent(intent)
+    Mmp.handleDeepLink(this, intent)
+}
 ```
+
+---
+
+### 全链路协作 SOP（推广 → 运营 → SDK 识别）
+
+关于**市场投放命名规范、OneLink/Tracker 模板、标准化事件字典、App Links 部署及三阶 QA 验收清单**，请参阅完整全链路指南：
+👉 [docs/MMP_SOP.md](docs/MMP_SOP.md)
 
 ---
 

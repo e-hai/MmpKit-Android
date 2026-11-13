@@ -1,5 +1,6 @@
 package com.kit.mmp.sample
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -52,6 +53,7 @@ import com.kit.mmp.sample.ui.theme.MmpKitTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Mmp.handleDeepLink(this, intent)
         enableEdgeToEdge()
         setContent {
             MmpKitTheme {
@@ -167,6 +169,12 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        Mmp.handleDeepLink(this, intent)
     }
 }
 

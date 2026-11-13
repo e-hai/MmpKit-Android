@@ -55,8 +55,9 @@ com.kit.mmp/
 | `setAttributionListener` | Forwards after cache update; re-delivers cache immediately if present |
 | `getAttribution { }` | Async; may hit vendor SDK; refreshes cache |
 | `setDeepLinkListener` | Deep link / deferred deep link |
+| `handleDeepLink(context, intent / uri)` | Forwards incoming Activity Intent / Uri for direct deep link resolution |
 
-`MmpClient` must implement: `initialize`, `setAttributionListener`, `setDeepLinkListener`, `trackEvent`, `trackRevenue`, `getAttribution`, `peekAttribution`.
+`MmpClient` must implement: `initialize`, `setAttributionListener`, `setDeepLinkListener`, `trackEvent`, `trackRevenue`, `getAttribution`, `peekAttribution` (and optionally `handleDeepLink`, which defaults to a no-op).
 
 ## Vendor Quirks (Android)
 
@@ -64,7 +65,7 @@ com.kit.mmp/
 - `appToken` = Dev Key
 - Event names are readable strings
 - Revenue: `AFInAppEventParameterName.REVENUE` + `CURRENCY`
-- UDL: `subscribeForDeepLink`
+- UDL: `subscribeForDeepLink` + `performOnDeepLinking(intent, context)`
 - App manifest may need `tools:replace` for `dataExtractionRules` / `fullBackupContent`
 - Has `simulateConversionData` / `simulateDeepLink` for local testing
 
@@ -73,6 +74,7 @@ com.kit.mmp/
 - `MmpEvent.name` / `MmpRevenue.eventName` = **event tokens**
 - `isDebug` → sandbox vs production
 - Deferred deep links: `setOnDeferredDeeplinkResponseListener`
+- Direct deep links: `Adjust.processAndResolveDeeplink(AdjustDeeplink(uri), context)`
 - Has `simulateAttributionData` / `simulateDeepLink` for local testing
 
 ## Sample Conventions

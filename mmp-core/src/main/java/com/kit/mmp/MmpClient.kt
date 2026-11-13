@@ -1,6 +1,7 @@
 package com.kit.mmp
 
 import android.content.Context
+import android.content.Intent
 import com.kit.mmp.attribution.AttributionData
 import com.kit.mmp.attribution.AttributionListener
 import com.kit.mmp.config.MmpConfig
@@ -21,4 +22,9 @@ interface MmpClient {
 
     /** Returns cached attribution immediately, or null if not yet available. */
     fun peekAttribution(): AttributionData?
+
+    /**
+     * Forwards a direct deep link [Intent] (from Activity.onCreate / onNewIntent) to the vendor SDK.
+     */
+    fun handleDeepLink(context: Context, intent: Intent?) {}
 }

@@ -11,7 +11,7 @@ plugins {
 val mmpGroup = providers.gradleProperty("GROUP_ID")
     .orElse(providers.gradleProperty("GROUP"))
     .orElse("com.github.e-hai")
-val mmpVersion = providers.gradleProperty("VERSION_NAME").orElse("1.0.0")
+val mmpVersion = providers.gradleProperty("VERSION_NAME").orElse("1.0.1")
 
 subprojects {
     if (!name.startsWith("mmp-")) return@subprojects

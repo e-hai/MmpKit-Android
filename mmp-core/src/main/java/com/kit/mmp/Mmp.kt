@@ -1,6 +1,8 @@
 package com.kit.mmp
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import com.kit.mmp.attribution.AttributionData
 import com.kit.mmp.attribution.AttributionListener
 import com.kit.mmp.config.MmpConfig
@@ -92,6 +94,26 @@ object Mmp {
     fun setDeepLinkListener(listener: DeepLinkListener?) {
         MmpLog.d("setDeepLinkListener(listener=${listener != null})")
         withClient("setDeepLinkListener") { it.setDeepLinkListener(listener) }
+    }
+
+    /**
+     * Forwards an incoming deep link [Intent] (e.g. from Activity.onCreate / onNewIntent)
+     * to the underlying MMP SDK so direct App Links / URI Schemes trigger [DeepLinkListener].
+     */
+    fun handleDeepLink(context: Context, intent: Intent?) {
+        MmpLog.d("handleDeepLink(data=${intent?.data})")
+        withClient("handleDeepLink") { it.handleDeepLink(context.applicationContext, intent) }
+    }
+
+    /**
+     * Convenience overload to forward a deep link [Uri] directly.
+     */
+    fun handleDeepLink(context: Context, uri: Uri?) {
+        if (uri == null) {
+            MmpLog.d("handleDeepLink skipped: uri null")
+            return
+        }
+        handleDeepLink(context, Intent(Intent.ACTION_VIEW, uri))
     }
 
     fun trackEvent(name: String, params: Map<String, Any?> = emptyMap()) {

@@ -1,10 +1,12 @@
 package com.kit.mmp.adjust
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import com.adjust.sdk.Adjust
 import com.adjust.sdk.AdjustAttribution
 import com.adjust.sdk.AdjustConfig
+import com.adjust.sdk.AdjustDeeplink
 import com.adjust.sdk.AdjustEvent
 import com.adjust.sdk.LogLevel
 import com.kit.mmp.MmpClient
@@ -56,11 +58,7 @@ class AdjustClient : MmpClient {
                 MmpLog.d("Adjust deferred deeplink null", TAG)
                 return@setOnDeferredDeeplinkResponseListener false
             }
-            val mapped = DeepLinkResult(
-                deepLinkValue = uri.toString(),
-                clickEvent = uri.queryParameterNames.associateWith { uri.getQueryParameter(it) },
-                isDeferred = true,
-            )
+            val mapped = uri.toDeepLinkResult(isDeferred = true)
             MmpLog.i("Adjust deferred deeplink: $mapped", TAG)
             deepLinkListener?.onDeepLink(mapped)
             // App handles navigation via DeepLinkListener.
@@ -82,6 +80,24 @@ class AdjustClient : MmpClient {
     override fun setDeepLinkListener(listener: DeepLinkListener?) {
         MmpLog.d("Adjust setDeepLinkListener(listener=${listener != null})", TAG)
         deepLinkListener = listener
+    }
+
+    override fun handleDeepLink(context: Context, intent: Intent?) {
+        val uri = intent?.data ?: run {
+            MmpLog.d("Adjust handleDeepLink skipped: intent data null", TAG)
+            return
+        }
+        MmpLog.d("Adjust handleDeepLink uri=$uri", TAG)
+        Adjust.processAndResolveDeeplink(AdjustDeeplink(uri), context.applicationContext) { resolvedLink ->
+            val resolvedUri = resolvedLink?.takeIf { it.isNotBlank() }?.let { Uri.parse(it) }
+            if (resolvedUri == null) {
+                MmpLog.w("Adjust direct deeplink unresolved or empty", TAG)
+                return@processAndResolveDeeplink
+            }
+            val mapped = resolvedUri.toDeepLinkResult(isDeferred = false)
+            MmpLog.i("Adjust direct deeplink resolved: $mapped", TAG)
+            deepLinkListener?.onDeepLink(mapped)
+        }
     }
 
     override fun trackEvent(event: MmpEvent) {
@@ -155,6 +171,12 @@ class AdjustClient : MmpClient {
 
     private companion object {
         const val TAG = "MmpKit/Adjust"
+
+        fun Uri.toDeepLinkResult(isDeferred: Boolean): DeepLinkResult = DeepLinkResult(
+            deepLinkValue = toString(),
+            clickEvent = queryParameterNames.associateWith { getQueryParameter(it) },
+            isDeferred = isDeferred,
+        )
 
         fun AdjustAttribution.toAttributionData(): AttributionData {
             val raw = linkedMapOf<String, Any?>(

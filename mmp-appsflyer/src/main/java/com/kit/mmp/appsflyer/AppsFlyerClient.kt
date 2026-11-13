@@ -1,6 +1,7 @@
 package com.kit.mmp.appsflyer
 
 import android.content.Context
+import android.content.Intent
 import com.appsflyer.AFInAppEventParameterName
 import com.appsflyer.AppsFlyerConversionListener
 import com.appsflyer.AppsFlyerLib
@@ -61,6 +62,15 @@ class AppsFlyerClient : MmpClient {
     override fun setDeepLinkListener(listener: MmpDeepLinkListener?) {
         MmpLog.d("AppsFlyer setDeepLinkListener(listener=${listener != null})", TAG)
         deepLinkListener = listener
+    }
+
+    override fun handleDeepLink(context: Context, intent: Intent?) {
+        if (intent?.data == null) {
+            MmpLog.d("AppsFlyer handleDeepLink skipped: intent data null", TAG)
+            return
+        }
+        MmpLog.d("AppsFlyer handleDeepLink data=${intent.data}", TAG)
+        AppsFlyerLib.getInstance().performOnDeepLinking(intent, context.applicationContext)
     }
 
     override fun trackEvent(event: MmpEvent) {
